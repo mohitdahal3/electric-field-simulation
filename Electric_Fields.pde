@@ -1,10 +1,10 @@
-final float ALL_PARTICLES_MASS = 1;
-final float PERMITTIVITY = 0.5;
-final float ALL_PARTICLES_RADIUS = 30;
-final float UNIT_CHARGE = 50;
+final double ALL_PARTICLES_MASS = 1.0;
+final double PERMITTIVITY = 0.5;
+final double ALL_PARTICLES_RADIUS = 30.0;
+final double UNIT_CHARGE = 50.0;
 
 
-float w;
+double w;
 color positiveColor;
 color negativeColor;
 
@@ -15,7 +15,7 @@ void setup(){
   fullScreen(P2D);
   frameRate(110);
   
-  w = 40;
+  w = 40.0;
   positiveColor = color(163, 41, 41);
   negativeColor = color(41, 51, 163);
   
@@ -82,7 +82,7 @@ void keyPressed(){
   }
 }
 
-float dist(PVector a , PVector b){
+double dist(DVector a , DVector b){
   return dist(a.x , a.y , b.x , b.y);
 }
 
