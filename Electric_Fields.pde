@@ -7,12 +7,19 @@ final double UNIT_CHARGE = 50.0;
 double w;
 color positiveColor;
 color negativeColor;
+color longArrowColor;
+color arrowColor;
+
 double outerForceStrength;
+
+float maxArrowLength;
+float maxStrokeWeight;
 
 Grid grid;
 ArrayList<Particle> particles;
 
 boolean gridVisible;
+boolean arrowVisible;
 boolean menuVisible;
 
 void setup(){
@@ -23,13 +30,20 @@ void setup(){
   w = 40.0;
   positiveColor = color(163, 41, 41);
   negativeColor = color(41, 51, 163);
+  longArrowColor = color(255, 179, 0);
+  arrowColor = color(76, 205, 31);
+  
+  maxArrowLength = ( (float) w * 3 ) / 4;
+  maxStrokeWeight = 3;
+  
   
   grid = new Grid();
   particles = new ArrayList<Particle>();
   
-  outerForceStrength = 1.0;
+  outerForceStrength = 0.1;
   
   gridVisible = true;
+  arrowVisible = true;
   menuVisible = false;
 }
 
@@ -38,6 +52,11 @@ void draw(){
   
   if(gridVisible){
     grid.showGrid();
+  }
+  
+  if(arrowVisible){
+    grid.calculateArrowValues();
+    grid.drawArrows();
   }
   
   
@@ -76,6 +95,21 @@ void draw(){
       particle.velocity.y *= -1;
     }
     
+    // For outer force
+    if(keyPressed){
+        if(particle.containsMouse()){
+          particle.applyForce(
+              (keyCode == UP)? new DVector(0.0 , -outerForceStrength)
+            : (keyCode == DOWN)? new DVector(0.0 , outerForceStrength)
+            : (keyCode == RIGHT)? new DVector(outerForceStrength , 0.0)
+            : (keyCode == LEFT)? new DVector(-outerForceStrength , 0.0)
+            : new DVector(0.0 , 0.0)
+          );
+        }
+    }
+    
+    
+    
     
     particle.update();
     particle.show();
@@ -103,22 +137,10 @@ void keyPressed(){
   if(key == 'm'){
     menuVisible = true;
   }
-  
-  if(keyCode == UP || keyCode == DOWN || keyCode == LEFT || keyCode == RIGHT){
-    for(Particle particle : particles){
-      if(particle.containsMouse()){
-        particle.applyForce(
-            (keyCode == UP)? new DVector(0.0 , -outerForceStrength)
-          : (keyCode == DOWN)? new DVector(0.0 , outerForceStrength)
-          : (keyCode == RIGHT)? new DVector(outerForceStrength , 0.0)
-          : (keyCode == LEFT)? new DVector(-outerForceStrength , 0.0)
-          : new DVector(0.0 , 0.0)
-        );
-      }
-    }
+  if(key == 'a'){
+    arrowVisible = !arrowVisible;
   }
-  
-  
+    
 }
 
 void keyReleased(){
@@ -187,7 +209,44 @@ void drawMenu(){
     textAlign(LEFT , CENTER);
     text(descriptionsTexts[i] , textXvalue + actionDescGap , headerYvalue + headerTextGap + (i * textGap));
     
+  } 
+}
+
+void drawArrow(DVector arrow , DVector base){
+  arrow = arrow.copy();
+  base = base.copy();
+  
+  double arrowLength = arrow.mag();
+  double extraLength;
+    
+  stroke(arrowColor);
+  
+  if(arrowLength > maxArrowLength ){
+    extraLength = arrowLength - maxArrowLength;
+    arrowLength = maxArrowLength;
+    arrow.setMag(arrowLength);
   }
+  
+  float tipAngle = radians(20);
+  float tipLength = (float)arrowLength / 4;
+  PVector tipArrow = new PVector((float)arrow.x , (float)arrow.y); //special case
+  tipArrow.setMag(-tipLength);
+  
+  strokeWeight(map((float)arrowLength , 0 , maxArrowLength , 0 , maxStrokeWeight));
+  
+  
+  pushMatrix();
+  
+  translate((float)base.x , (float)base.y);
+  line(0 , 0 , (float)arrow.x , (float)arrow.y);
+  
+  pushMatrix();
+  translate((float)arrow.x , (float)arrow.y);
+  line(0 , 0 , tipArrow.copy().rotate(tipAngle).x , tipArrow.copy().rotate(tipAngle).y);
+  line(0 , 0 , tipArrow.copy().rotate(-tipAngle).x , tipArrow.copy().rotate(-tipAngle).y);
+  popMatrix();
+  
+  popMatrix();
   
   
 }

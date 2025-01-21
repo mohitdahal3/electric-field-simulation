@@ -32,6 +32,40 @@ class Grid{
       line(0 , (float)(j * w) , width , (float)(j * w));
     }
   }
+  
+  void calculateArrowValues(){
+    for(int i = 0; i < this.numVerticalLines; i++){
+      for(int j = 0; j < this.numHorizontalLines; j++){
+        
+        this.arrowValues[i][j] = new DVector();
+        DVector result = new DVector();
+        
+        for(Particle particle : particles){
+          double r = dist(particle.position , this.intersections[i][j]);
+          if(r < particle.radius){
+            r = particle.radius;
+          }
+          double magnitude = (particle.charge * 10000) / (4 * PI * PERMITTIVITY * Math.pow(r , 1.6));
+          DVector direction = DVector.sub(this.intersections[i][j] , particle.position);
+          direction.setMag(magnitude);
+          result.add(direction);
+        }
+        
+        this.arrowValues[i][j] = result.copy();
+        
+      }
+    }
+  }
+  
+  void drawArrows(){
+    for(int i = 0; i < this.numVerticalLines; i++){
+      for(int j = 0; j < this.numHorizontalLines; j++){
+        drawArrow(this.arrowValues[i][j].copy() , this.intersections[i][j].copy());
+      }
+    }
+  }
+  
+  
 }
 
 
