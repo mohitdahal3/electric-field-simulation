@@ -30,8 +30,8 @@ void setup(){
   w = 40.0;
   positiveColor = color(163, 41, 41);
   negativeColor = color(41, 51, 163);
-  longArrowColor = color(255, 179, 0);
-  arrowColor = color(76, 205, 31);
+  longArrowColor = color(255, 145, 0);
+  arrowColor = color(104, 205, 31);
   
   maxArrowLength = ( (float) w * 3 ) / 4;
   maxStrokeWeight = 3;
@@ -113,11 +113,18 @@ void draw(){
     
     particle.update();
     particle.show();
+    
   }
+  
   
   if(menuVisible){
     background(255);
     drawMenu();
+  }else{
+    textSize(25);
+    textAlign(LEFT , TOP);
+    fill(255);
+    text("Hold 'm' to see controls" , 5 , 5);   
   }
 }
 
@@ -139,6 +146,20 @@ void keyPressed(){
   }
   if(key == 'a'){
     arrowVisible = !arrowVisible;
+  }
+  if(key == 'd'){
+    Particle particleToRemove = null;
+    
+    for(Particle particle : particles){
+      if(particle.containsMouse()){
+        particleToRemove = particle;
+      }
+    }
+    
+    if(particleToRemove != null){
+      particles.remove(particleToRemove);
+    }
+
   }
     
 }
@@ -168,6 +189,7 @@ void drawMenu(){
     "'n'",
     "Mouse Click",
     "'x'",
+    "'d'",
     "'g'",
     "'a'",
     "Arrow Keys",
@@ -179,6 +201,7 @@ void drawMenu(){
     "Add Negative Charge",
     "Freeze / Unfreeze a particle",
     "Remove all particles",
+    "Remove the Particle containing mouse",
     "Toggle Grid",
     "Toggle Arrows",
     "Apply Force to particles",
@@ -217,9 +240,8 @@ void drawArrow(DVector arrow , DVector base){
   base = base.copy();
   
   double arrowLength = arrow.mag();
-  double extraLength;
-    
-  stroke(arrowColor);
+  double extraLength = 0.0;;
+  
   
   if(arrowLength > maxArrowLength ){
     extraLength = arrowLength - maxArrowLength;
@@ -227,13 +249,18 @@ void drawArrow(DVector arrow , DVector base){
     arrow.setMag(arrowLength);
   }
   
+  //arbritary decision based on some calcualtions
+  extraLength = constrain((int)extraLength , 0 , 1920);
+  float a = map((float)extraLength , 0 , 361 - maxArrowLength , 0 , 1);
+  stroke(colorMap(color(115, 205, 31) , longArrowColor , a));
+  
   float tipAngle = radians(20);
   float tipLength = (float)arrowLength / 4;
   PVector tipArrow = new PVector((float)arrow.x , (float)arrow.y); //special case
   tipArrow.setMag(-tipLength);
   
-  strokeWeight(map((float)arrowLength , 0 , maxArrowLength , 0 , maxStrokeWeight));
   
+  strokeWeight(map((float)arrowLength , 0 , maxArrowLength , 0 , maxStrokeWeight));
   
   pushMatrix();
   
@@ -248,5 +275,24 @@ void drawArrow(DVector arrow , DVector base){
   
   popMatrix();
   
-  
+}
+
+
+
+color colorMap(color c1, color c2, float a) {
+    a = constrain(a, 0, 1);
+
+    float r1 = red(c1);
+    float g1 = green(c1);
+    float b1 = blue(c1);
+    
+    float r2 = red(c2);
+    float g2 = green(c2);
+    float b2 = blue(c2);
+
+    float r = lerp(r1, r2, a);
+    float g = lerp(g1, g2, a);
+    float b = lerp(b1, b2, a);
+
+    return color(r, g, b);
 }
