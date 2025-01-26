@@ -163,12 +163,12 @@ class Particle{
     
       va2 = ( ((this.mass - other.mass)/(this.mass + other.mass)) * (va1)) + ( ((2 * other.mass)/(this.mass + other.mass)) *(vb1) ); 
       vb2 = ( ((other.mass - this.mass)/(this.mass + other.mass)) * (vb1)) + ( ((2 * this.mass)/(this.mass + other.mass))*(va1) );
+      
+      DVector postCollisionVelocityA = centerDisplacementA.copy().setMag(va2);
+      DVector postCollisionVelocityB = centerDisplacementB.copy().setMag(-vb2);
     
-      effectiveVelocityA.setMag(va2);
-      effectiveVelocityB.setMag(-vb2);
-    
-      this.velocity = DVector.add(effectiveVelocityA , perpVelocityA);
-      other.velocity = DVector.add(effectiveVelocityB , perpVelocityB);
+      this.velocity = DVector.add(postCollisionVelocityA , perpVelocityA);
+      other.velocity = DVector.add(postCollisionVelocityB , perpVelocityB);
     
       if(centerDisplacementA.mag() < this.radius + other.radius){
         double overlap = this.radius + other.radius - centerDisplacementA.mag();
