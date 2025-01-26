@@ -21,6 +21,7 @@ ArrayList<Particle> particles;
 boolean gridVisible;
 boolean arrowVisible;
 boolean menuVisible;
+boolean particlesVisible;
 
 void setup(){
   //size(500 , 500);
@@ -45,6 +46,7 @@ void setup(){
   gridVisible = true;
   arrowVisible = true;
   menuVisible = false;
+  particlesVisible = true;
 }
 
 void draw(){
@@ -112,7 +114,10 @@ void draw(){
     
     
     particle.update();
-    particle.show();
+    
+    if(particlesVisible){
+      particle.show();
+    }
     
   }
   
@@ -161,6 +166,9 @@ void keyPressed(){
     }
 
   }
+  if(key == 'h'){
+    particlesVisible = !particlesVisible;
+  }
     
 }
 
@@ -192,6 +200,7 @@ void drawMenu(){
     "'d'",
     "'g'",
     "'a'",
+    "'h'",
     "Arrow Keys",
     "Esc"    
   };
@@ -204,6 +213,7 @@ void drawMenu(){
     "Remove the Particle containing mouse",
     "Toggle Grid",
     "Toggle Arrows",
+    "Toggle Particles",
     "Apply Force to particles",
     "Exit"
   };
@@ -240,7 +250,10 @@ void drawArrow(DVector arrow , DVector base){
   base = base.copy();
   
   double arrowLength = arrow.mag();
-  double extraLength = 0.0;;
+  if(arrowLength < 4){
+    arrowLength = 4;
+  }
+  double extraLength = 0.0;
   
   
   if(arrowLength > maxArrowLength ){
@@ -260,7 +273,11 @@ void drawArrow(DVector arrow , DVector base){
   tipArrow.setMag(-tipLength);
   
   
-  strokeWeight(map((float)arrowLength , 0 , maxArrowLength , 0 , maxStrokeWeight));
+  float strokeWeightValue = map((float)arrowLength , 0 , maxArrowLength , 0 , maxStrokeWeight);
+  if(strokeWeightValue < 0.3){
+    strokeWeightValue = 0.3;
+  }
+  strokeWeight(strokeWeightValue);
   
   pushMatrix();
   
